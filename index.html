@@ -6,32 +6,27 @@
     <title>Đăng Ký Khách Hàng</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #eef2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .form-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 380px; }
-        h2 { margin-top: 0; color: #2c3e50; text-align: center; margin-bottom: 25px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; }
+        .form-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 380px; box-sizing: border-box; }
+        h2 { margin-top: 0; color: #2c3e50; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #34495e; font-size: 14px; }
         
-        /* Giao diện ô nhập số điện thoại */
-        input[type="tel"] { 
+        input[type="text"], input[type="tel"] { 
             width: 100%; 
-            padding: 14px; 
+            padding: 12px; 
             border: 2px solid #bdc3c7; 
             border-radius: 6px; 
             box-sizing: border-box; 
-            font-size: 18px; 
-            text-align: center;
+            font-size: 16px; 
             transition: border-color 0.3s;
         }
-        input[type="tel"]:focus { border-color: #3498db; outline: none; }
+        input:focus { border-color: #3498db; outline: none; }
         
-        button { width: 100%; padding: 14px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
-        button:hover { background-color: #2ecc71; }
+        button { width: 100%; padding: 14px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button:disabled { background-color: #95a5a6; cursor: not-allowed; }
         
-        .note { font-size: 13px; color: #7f8c8d; text-align: center; margin-top: 15px; }
-        
-        /* Box thông báo */
-        .message-box { margin-top: 20px; padding: 12px; border-radius: 6px; display: none; text-align: center; font-weight: bold; }
+        .note { font-size: 12px; color: #7f8c8d; text-align: center; margin-top: 12px; line-height: 1.4; }
+        .message-box { margin-top: 15px; padding: 10px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 14px; }
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
@@ -41,64 +36,64 @@
 
 <div class="form-container">
     <h2>Điền Thông Tin</h2>
-    <form id="submitForm">
+    <form id="submitForm" autocomplete="on">
+        
+        <div class="form-group">
+            <label for="name">Họ và tên:</label>
+            <input type="text" id="name" name="name" autocomplete="name" placeholder="Nhập họ và tên của bạn" required>
+        </div>
+
         <div class="form-group">
             <label for="phone">Số điện thoại:</label>
-            <input type="tel" id="phone" name="tel" autocomplete="tel-national" placeholder="Chạm vào để điền tự động" pattern="[0-9]{9,11}" required title="Vui lòng nhập đúng định dạng số điện thoại">
+            <input type="tel" id="phone" name="tel" autocomplete="tel-national" placeholder="Chạm vào để chọn số" pattern="[0-9]{9,11}" required>
         </div>
+        
         <button type="submit" id="btnSubmit">Xác nhận gửi</button>
-        <div class="note">Trình duyệt sẽ tự động gợi ý số điện thoại của bạn khi chạm vào ô trống.</div>
+        <div class="note">💡 Mẹo: Chạm vào các ô trống để trình duyệt tự động gợi ý thông tin cá nhân của bạn.</div>
     </form>
     
     <div id="message" class="message-box"></div>
 </div>
 
 <script>
-    // -------------------------------------------------------------
-    // DÁN ĐƯỜNG LINK WEB APP URL CỦA GOOGLE APPS SCRIPT VÀO ĐÂY:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPDFZlrH2CCs0Z5C-yu84OHtNIOnsbNNfHQX1qo5EUd4rS89vgvARqiCEM52_o6RFAOg/exec";
-    // -------------------------------------------------------------
+    const SCRIPT_URL = "SCRIPT_URL_CỦA_BẠN";
 
     document.getElementById('submitForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Chặn việc tải lại trang
+        e.preventDefault();
         
+        const nameInput = document.getElementById('name').value;
         const phoneInput = document.getElementById('phone').value;
         const btnSubmit = document.getElementById('btnSubmit');
         const messageBox = document.getElementById('message');
         
-        // Hiện trạng thái đang xử lý
         btnSubmit.disabled = true;
         btnSubmit.innerText = "Đang xử lý...";
         messageBox.style.display = "block";
         messageBox.className = "message-box loading";
-        messageBox.innerText = "Đang kết nối với hệ thống...";
+        messageBox.innerText = "Đang kết nối hệ thống...";
 
-        // Sử dụng FormData để tránh lỗi bảo mật CORS của trình duyệt
-        let formData = new FormData();
-        formData.append("phone", phoneInput);
-
-        // Gửi dữ liệu đi
+        // Gửi cả số điện thoại lên máy chủ Google Sheets
         fetch(SCRIPT_URL, {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: "phone=" + encodeURIComponent(phoneInput)
         })
-        .then(response => response.json()) // Đọc dữ liệu JSON trả về
+        .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
                 messageBox.className = "message-box success";
                 messageBox.innerText = data.message;
-                document.getElementById('phone').value = ""; // Làm sạch ô nhập
+                document.getElementById('submitForm').reset(); // Xóa sạch các ô nhập
             } else {
                 messageBox.className = "message-box error";
-                messageBox.innerText = data.message; // Báo lỗi trùng lặp từ Apps Script
+                messageBox.innerText = data.message;
             }
         })
         .catch(error => {
             messageBox.className = "message-box error";
-            messageBox.innerText = "Lỗi đường truyền! Vui lòng thử lại.";
+            messageBox.innerText = "Lỗi kết nối! Vui lòng thử lại.";
         })
         .finally(() => {
-            // Khôi phục lại nút bấm
             btnSubmit.disabled = false;
             btnSubmit.innerText = "Xác nhận gửi";
         });
